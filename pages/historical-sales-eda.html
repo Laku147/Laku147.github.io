@@ -1,0 +1,149 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta name="HandheldFriendly" content="True" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="robots" content="" />
+
+  <link href="https://fonts.googleapis.com/css?family=Source+Code+Pro|Source+Sans+Pro:300,400,400i,700" rel="stylesheet">
+
+    <link rel="stylesheet" type="text/css" href="/theme/stylesheet/style.min.css">
+
+  <link rel="stylesheet" type="text/css" href="/theme/pygments/github.min.css">
+  <link rel="stylesheet" type="text/css" href="/theme/font-awesome/css/font-awesome.min.css">
+
+
+
+
+
+
+
+    <meta name="author" content="Marek Mikesell" />
+    <meta name="description" content="" />
+<meta property="og:site_name" content="147.Data"/>
+<meta property="og:type" content="blog"/>
+<meta property="og:title" content="147.Data"/>
+<meta property="og:description" content=""/>
+<meta property="og:locale" content="en_US"/>
+<meta property="og:url" content=""/>
+
+  <title>147.Data &ndash; Historical Sales EDA</title>
+
+</head>
+<body>
+  <aside>
+    <div>
+      <a href="">
+         <p><h2>Marek Mikesell</h2></p>
+        <!--img src="/theme/img/profile.png" alt="" title=""-->
+      </a>
+      <h1><a href=""></a></h1>
+
+
+      <nav>
+        <ul class="list">
+          <li><a href="/pages/about.html#about">About</a></li>
+          <li><a href="/pages/historical-sales-eda.html#historical-sales-eda">Historical Sales EDA</a></li>
+          <li><a href="/pages/home.html#home">Home</a></li>
+
+        </ul>
+      </nav>
+
+      <ul class="social">
+      </ul>
+    </div>
+
+
+  </aside>
+  <main>
+
+
+<article class="single">
+  <header>
+    
+    <h1 id="historical-sales-eda">Historical Sales EDA</h1>
+  </header>
+  <div>
+<p>*This is <strong>not an analysis report</strong>, just an example of informal data analysis.</p>
+<p>This data-set contains historical sales data. The business objective in mind is to <em>propose inventory items which to could be replaced with something that might sell better.</em> I imported the data and removed columns that weren't useful. I also renamed some columns so their names better reflected the data they represented. To start, I calculated three new useful columns:  </p>
+<div class="highlight"><pre><span></span><span class="n">df</span><span class="p">[</span><span class="s1">&#39;ItemTotalSales&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="s1">&#39;SoldCount&#39;</span><span class="p">]</span> <span class="o">*</span> <span class="n">df</span><span class="p">[</span><span class="s1">&#39;Price&#39;</span><span class="p">]</span>
+
+<span class="n">df</span><span class="p">[</span><span class="s1">&#39;PercentageOfTotalSales&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="s1">&#39;ItemTotalSales&#39;</span><span class="p">]</span> <span class="o">/</span> <span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="s1">&#39;ItemTotalSales&#39;</span><span class="p">].</span><span class="k">sum</span><span class="p">())</span>
+
+<span class="n">df</span><span class="p">[</span><span class="s1">&#39;YearlyPriceAverage&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="s1">&#39;ItemTotalSales&#39;</span><span class="p">]</span> <span class="o">/</span> <span class="p">((</span><span class="n">df_active</span><span class="p">[</span><span class="s1">&#39;ReleaseYear&#39;</span><span class="p">].</span><span class="k">unique</span><span class="p">().</span><span class="k">max</span><span class="p">())</span> <span class="o">-</span>  <span class="n">df</span><span class="p">[</span><span class="s1">&#39;ReleaseYear&#39;</span><span class="p">])</span>
+</pre></div>
+
+
+<p><img alt="Info" src="../images/historical_sales_images/info_00.png" title="info">  </p>
+<p>Let's take a look at some of the distributions.  </p>
+<p><strong>Items sold vs unsold:</strong><br>
+Only a small portion of the inventory sells.  </p>
+<p><img alt="SoldvsUnsold" src="../images/historical_sales_images/Sold.png" title="Sold vs Unsold">  </p>
+<p><strong>Price distribution of items that have sold:</strong><br>
+It's right-skewed and looks a bit log-normally distributed.</p>
+<p><img alt="Price_Dist" src="../images/historical_sales_images/price_dist_sold_00.png" title="price distribution of sold items">  </p>
+<p><strong>Total Sales by Item</strong> (Sold and Unsold):<br>
+There seems to be many items that haven't sold any units. We also see that the vast majority of the total sales is spread across many different items with low sales on a per-item basis.  </p>
+<p><img alt="TotalSales" src="../images/historical_sales_images/ItemTotalSales.png" title="Total Sales">  </p>
+<p><strong>Items grouped by number sold, with mean percentage of total sales:</strong><br>
+Here it seems that we have a huge spike at 35 items sold. While not directly related to our business objective, this is something that is worth looking into, as it could possibly be some sort of bottle-neck. Unfortunately the data is limited regarding this, so we'd reach out to the appropriate people instead.  </p>
+<p><img alt="SoldCount" src="../images/historical_sales_images/SoldCount_PercSales.png" title="Sold Count per Sales">  </p>
+<p><strong>Pair-plot:</strong><br>
+Now lets bring up a pair-plot for some bi-variate analysis. Because of the large amount of data, we'll take a sample of 200 from the items <em>that have sold.</em></p>
+<p><img alt="Pairplot" src="../images/historical_sales_images/pairplot.png" title="pairplot">  </p>
+<p>The plot underlined in red above indicates that there's a correlation between Price of an item and its TotalPercentageOfSales, so let's investigate further.  </p>
+<div class="highlight"><pre><span></span><span class="n">df</span><span class="p">[</span><span class="s1">&#39;PercentageOfTotalSales&#39;</span><span class="p">][</span><span class="n">df</span><span class="p">[</span><span class="s1">&#39;Price&#39;</span><span class="p">]</span> <span class="o">&lt;</span> <span class="mi">100</span><span class="p">].</span><span class="k">sum</span><span class="p">()</span>  
+<span class="mi">0</span><span class="p">.</span><span class="mi">252</span><span class="p">...</span>
+
+
+<span class="n">df</span><span class="p">[</span><span class="s1">&#39;PercentageOfTotalSales&#39;</span><span class="p">][</span><span class="n">df</span><span class="p">[</span><span class="s1">&#39;Price&#39;</span><span class="p">]</span> <span class="o">&lt;</span> <span class="mi">50</span><span class="p">].</span><span class="k">sum</span><span class="p">()</span>  
+<span class="mi">0</span><span class="p">.</span><span class="mi">0563</span><span class="p">...</span>
+</pre></div>
+
+
+<p>25% of the total sales for items Priced under 100 and just 5.6% for under 50. Now let's look at the volume for that price range.  </p>
+<div class="highlight"><pre><span></span><span class="err">df[(df[&#39;Price&#39;] &lt; 50) &amp; (df[&#39;Sold&#39;] == 1)].count() / df[(df[&#39;Price&#39;] &gt;= 50) &amp; (df[&#39;Sold&#39;]   1)].count()  </span>
+<span class="err">0.282...</span>
+</pre></div>
+
+
+<p>So 28% of the item types sold make up 5.6% of total sales.  </p>
+<p><strong>Price categories as total percentage of total sales:</strong><br>
+A sharp rise from the 0 to 80 dollar price tag, followed by a gradual descent. There are a few outliers grouped into a 420 - 5k price range bin on the right.  </p>
+<p><img alt="PriceCat" src="../images/historical_sales_images/PriceCategory_PercOfTotalSales.png" title="Price Category % of total Sales">  </p>
+<p><strong>Marketing type with sold counts:</strong><br>
+Among the two marketing types used, it would seem that type D is more effective. However, this is too little information to go on. Perhaps the marketing type D is used with product lines that tend to sell better, or perhaps it's more effective, but also more expensive. So a better question is whether it's more 'cost'-effective.  </p>
+<p><img alt="Marketing Type" src="../images/historical_sales_images/MarketingType.png" title="Marketing Type">  </p>
+<p><strong>Average Sales Percentage Total by Release Year:</strong><br>
+Older items still seem to be worth keeping around. Although we can see we have fewer older items in our inventory, as is suggested by the large confidence interval ranges for older years.</p>
+<p><img alt="Release Year" src="../images/historical_sales_images/ReleaseYear_SalesPercentage.png" title="Release Year">  </p>
+<h4><strong>Conclusion:</strong></h4>
+<p>The data shows that items under the fifty-dollar price generate a much smaller portion of the sales even though they account for thirty-three percent of the inventory items sold. I would be wary of adopting new items within this price range, and it wouldn't be a loss to remove the items in that price range that haven't sold. If pressed for a second criteria, I would say evaluate older release year items on a case-by-case basis when adopting new ones, but it would be safe to remove unsold items with old release date (perhaps keeping items with larger price tags in stock).  </p>
+<p>Finally, there is a clear opportunity for more categories of data collection. Another great metric that may be worth asking for are the yearly or quarterly sales to see an increasing or decreasing buying trend on a per-item basis.  </p>  </div>
+</article>
+
+    <footer>
+<p>&copy;  </p>
+<p>    Powered by <a href="http://getpelican.com" target="_blank">Pelican</a> - <a href="https://github.com/alexandrevicenzi/flex" target="_blank">Flex</a> theme by <a href="http://alexandrevicenzi.com" target="_blank">Alexandre Vicenzi</a>
+</p>    </footer>
+  </main>
+
+
+
+
+<script type="application/ld+json">
+{
+  "@context" : "http://schema.org",
+  "@type" : "Blog",
+  "name": " 147.Data ",
+  "url" : "",
+  "image": "",
+  "description": ""
+}
+</script>
+
+</body>
+</html>
