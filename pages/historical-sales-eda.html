@@ -48,6 +48,7 @@
           <li><a href="/pages/about.html#about">About</a></li>
           <li><a href="/pages/historical-sales-eda.html#historical-sales-eda">Historical Sales EDA</a></li>
           <li><a href="/pages/home.html#home">Home</a></li>
+          <li><a href="/pages/top-female-chess-players-eda.html#top-female-chess-players-eda">Top Female Chess Players EDA</a></li>
 
         </ul>
       </nav>
@@ -69,11 +70,11 @@
   <div>
 <p>*This is <strong>not an analysis report</strong>, just an example of informal data analysis.</p>
 <p>This data-set contains historical sales data. The business objective in mind is to <em>propose inventory items which to could be replaced with something that might sell better.</em> I imported the data and removed columns that weren't useful. I also renamed some columns so their names better reflected the data they represented. To start, I calculated three new useful columns:  </p>
-<div class="highlight"><pre><span></span><span class="n">df</span><span class="p">[</span><span class="s1">&#39;ItemTotalSales&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="s1">&#39;SoldCount&#39;</span><span class="p">]</span> <span class="o">*</span> <span class="n">df</span><span class="p">[</span><span class="s1">&#39;Price&#39;</span><span class="p">]</span>
+<div class="highlight"><pre><span></span>df[&#39;ItemTotalSales&#39;] = df[&#39;SoldCount&#39;] * df[&#39;Price&#39;]
 
-<span class="n">df</span><span class="p">[</span><span class="s1">&#39;PercentageOfTotalSales&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="s1">&#39;ItemTotalSales&#39;</span><span class="p">]</span> <span class="o">/</span> <span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="s1">&#39;ItemTotalSales&#39;</span><span class="p">].</span><span class="k">sum</span><span class="p">())</span>
+df[&#39;PercentageOfTotalSales&#39;] = df[&#39;ItemTotalSales&#39;] / (df[&#39;ItemTotalSales&#39;].sum())
 
-<span class="n">df</span><span class="p">[</span><span class="s1">&#39;YearlyPriceAverage&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="s1">&#39;ItemTotalSales&#39;</span><span class="p">]</span> <span class="o">/</span> <span class="p">((</span><span class="n">df_active</span><span class="p">[</span><span class="s1">&#39;ReleaseYear&#39;</span><span class="p">].</span><span class="k">unique</span><span class="p">().</span><span class="k">max</span><span class="p">())</span> <span class="o">-</span>  <span class="n">df</span><span class="p">[</span><span class="s1">&#39;ReleaseYear&#39;</span><span class="p">])</span>
+df[&#39;YearlyPriceAverage&#39;] = df[&#39;ItemTotalSales&#39;] / ((df_active[&#39;ReleaseYear&#39;].unique().max()) -  df[&#39;ReleaseYear&#39;])
 </pre></div>
 
 
@@ -86,7 +87,7 @@ Only a small portion of the inventory sells.  </p>
 It's right-skewed and looks a bit log-normally distributed.</p>
 <p><img alt="Price_Dist" src="../images/historical_sales_images/price_dist_sold_00.png" title="price distribution of sold items">  </p>
 <p><strong>Total Sales by Item</strong> (Sold and Unsold):<br>
-There seems to be many items that haven't sold any units. We also see that the vast majority of the total sales is spread across many different items with low sales on a per-item basis.  </p>
+There seems to be many items that haven't sold any units. We also see that the large majority of the total sales is spread across many different items with low sales on a per-item basis.  </p>
 <p><img alt="TotalSales" src="../images/historical_sales_images/ItemTotalSales.png" title="Total Sales">  </p>
 <p><strong>Items grouped by number sold, with mean percentage of total sales:</strong><br>
 Here it seems that we have a huge spike at 35 items sold. While not directly related to our business objective, this is something that is worth looking into, as it could possibly be some sort of bottle-neck. Unfortunately the data is limited regarding this, so we'd reach out to the appropriate people instead.  </p>
@@ -95,18 +96,18 @@ Here it seems that we have a huge spike at 35 items sold. While not directly rel
 Now lets bring up a pair-plot for some bi-variate analysis. Because of the large amount of data, we'll take a sample of 200 from the items <em>that have sold.</em></p>
 <p><img alt="Pairplot" src="../images/historical_sales_images/pairplot.png" title="pairplot">  </p>
 <p>The plot underlined in red above indicates that there's a correlation between Price of an item and its TotalPercentageOfSales, so let's investigate further.  </p>
-<div class="highlight"><pre><span></span><span class="n">df</span><span class="p">[</span><span class="s1">&#39;PercentageOfTotalSales&#39;</span><span class="p">][</span><span class="n">df</span><span class="p">[</span><span class="s1">&#39;Price&#39;</span><span class="p">]</span> <span class="o">&lt;</span> <span class="mi">100</span><span class="p">].</span><span class="k">sum</span><span class="p">()</span>  
-<span class="mi">0</span><span class="p">.</span><span class="mi">252</span><span class="p">...</span>
+<div class="highlight"><pre><span></span>df[&#39;PercentageOfTotalSales&#39;][df[&#39;Price&#39;] &lt; 100].sum()  
+0.252...
 
 
-<span class="n">df</span><span class="p">[</span><span class="s1">&#39;PercentageOfTotalSales&#39;</span><span class="p">][</span><span class="n">df</span><span class="p">[</span><span class="s1">&#39;Price&#39;</span><span class="p">]</span> <span class="o">&lt;</span> <span class="mi">50</span><span class="p">].</span><span class="k">sum</span><span class="p">()</span>  
-<span class="mi">0</span><span class="p">.</span><span class="mi">0563</span><span class="p">...</span>
+df[&#39;PercentageOfTotalSales&#39;][df[&#39;Price&#39;] &lt; 50].sum()  
+0.0563...
 </pre></div>
 
 
 <p>25% of the total sales for items Priced under 100 and just 5.6% for under 50. Now let's look at the volume for that price range.  </p>
-<div class="highlight"><pre><span></span><span class="err">df[(df[&#39;Price&#39;] &lt; 50) &amp; (df[&#39;Sold&#39;] == 1)].count() / df[(df[&#39;Price&#39;] &gt;= 50) &amp; (df[&#39;Sold&#39;]   1)].count()  </span>
-<span class="err">0.282...</span>
+<div class="highlight"><pre><span></span>df[(df[&#39;Price&#39;] &lt; 50) &amp; (df[&#39;Sold&#39;] == 1)].count() / df[(df[&#39;Price&#39;] &gt;= 50) &amp; (df[&#39;Sold&#39;]   1)].count()  
+0.282...
 </pre></div>
 
 
