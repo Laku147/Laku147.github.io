@@ -1,0 +1,125 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta name="HandheldFriendly" content="True" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="robots" content="" />
+
+  <link href="https://fonts.googleapis.com/css?family=Source+Code+Pro|Source+Sans+Pro:300,400,400i,700" rel="stylesheet">
+
+    <link rel="stylesheet" type="text/css" href="/theme/stylesheet/style.min.css">
+
+  <link rel="stylesheet" type="text/css" href="/theme/pygments/github.min.css">
+  <link rel="stylesheet" type="text/css" href="/theme/font-awesome/css/font-awesome.min.css">
+
+
+
+
+
+
+
+    <meta name="author" content="Marek Mikesell" />
+    <meta name="description" content="" />
+<meta property="og:site_name" content="147.Data"/>
+<meta property="og:type" content="blog"/>
+<meta property="og:title" content="147.Data"/>
+<meta property="og:description" content=""/>
+<meta property="og:locale" content="en_US"/>
+<meta property="og:url" content=""/>
+
+  <title>147.Data &ndash; Time Series - Solar Power</title>
+
+</head>
+<body>
+  <aside>
+    <div>
+      <a href="">
+         <p><h2>Marek Mikesell</h2></p>
+        <!--img src="/theme/img/profile.png" alt="" title=""-->
+      </a>
+      <h1><a href=""></a></h1>
+
+
+      <nav>
+        <ul class="list">
+          <li><a href="/pages/about.html#about">About</a></li>
+          <li><a href="/pages/historical-sales-eda.html#historical-sales-eda">Historical Sales EDA</a></li>
+          <li><a href="/pages/multiple-linear-regression.html#multiple-linear-regression">Multiple Linear Regression</a></li>
+          <li><a href="/pages/time-series-solar-power.html#time-series-solar-power">Time Series - Solar Power</a></li>
+          <li><a href="/pages/top-female-chess-players-eda.html#top-female-chess-players-eda">Top Female Chess Players EDA</a></li>
+
+        </ul>
+      </nav>
+
+      <ul class="social">
+      </ul>
+    </div>
+
+
+  </aside>
+  <main>
+
+
+<article class="single">
+  <header>
+    
+    <h1 id="time-series-solar-power">Time Series - Solar Power</h1>
+  </header>
+  <div>
+<p>Here I have a data-set on solar power generation of a power plant in India at 15 minute intervals over a 34 day period. I will use an ARIMA model without the seasonal component to forecast 3 days into the future.  </p>
+<p>There is a 'DAILY_YIELD' column that gives the cumulative amount of energy produced for that day. I will use the max DAILY_YIELD for each day and create a simplified data set of this daily data for the 34 days recorded. Below is the transform code. Feel free to skip over it.</p>
+<div class="highlight"><pre><span></span>  data.index = pd.to_datetime(data.index, format=&#39;%d-%m-%Y %M:%S&#39;)
+
+  data = data[&#39;DAILY_YIELD&#39;]
+
+  dates = pd.date_range(start=&#39;15-05-2020&#39;, end=&#39;17-06-2020&#39;, freq=&#39;D&#39;)
+
+  df = pd.Series(data=0.0, index=dates)
+
+  for i in df.index:
+      i = str(i)[:10]
+      df.loc[i] = data.loc[i].max()
+
+  df = df.map(int)
+</pre></div>
+
+
+<p>A plot of the transformed data:  </p>
+<p><img alt="TranformedData" src="../images/solar_img/transformed_data.png" title="Transformed Data"></p>
+<p>It seems pretty volatile but isn't showing any strong trends at a glance. I run an adfuller test to check stationarity, and it returns a p-value of .118, indicating that it's not stationary data.</p>
+<p>Next let's do a quick ETS decomposition to separate the errors, seasonality, and trend. Please pardon the lack of formatting.  </p>
+<p><img alt="ETS_Decomposition" src="../images/solar_img/ets_decomp.png">  </p>
+<p>There's a somewhat unpredictable trend, but with only 34 days I'd expect as much. It detects some seasonality with a variation range of roughly 500, and residuals with an even larger range, reaching a range of roughly 2500.</p>
+<p>I split the data roughly 80-20 for my train-test split. I then fit an ARIMA model with order=(1, 1, 1) (searched using auto_arima() from pmdarima package) and produced predictions on the test set.  </p>
+<p><img alt="Predictions" src="../images/solar_img/test_prediction.png" title="Test Prediction"></p>
+<p>There's overlap, however checking the RMSE returns a value of 1461. Not the greatest, but note that no seasonality was accounted for, which may decrease RMSE.</p>
+<p>Finally, I look at the three day forecast.</p>
+<p><img alt="Forecast" src="../images/solar_img/forecast.png" title="Three Day Forecast"></p>
+<p>Our forecast values are 6817, 7053, then 7124 for June 18, 19 and 20 respectively.</p>  </div>
+</article>
+
+    <footer>
+<p>&copy;  </p>
+<p>    Powered by <a href="http://getpelican.com" target="_blank">Pelican</a> - <a href="https://github.com/alexandrevicenzi/flex" target="_blank">Flex</a> theme by <a href="http://alexandrevicenzi.com" target="_blank">Alexandre Vicenzi</a>
+</p>    </footer>
+  </main>
+
+
+
+
+<script type="application/ld+json">
+{
+  "@context" : "http://schema.org",
+  "@type" : "Blog",
+  "name": " 147.Data ",
+  "url" : "",
+  "image": "",
+  "description": ""
+}
+</script>
+
+</body>
+</html>

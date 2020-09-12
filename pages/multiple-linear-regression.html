@@ -1,0 +1,124 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta name="HandheldFriendly" content="True" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="robots" content="" />
+
+  <link href="https://fonts.googleapis.com/css?family=Source+Code+Pro|Source+Sans+Pro:300,400,400i,700" rel="stylesheet">
+
+    <link rel="stylesheet" type="text/css" href="/theme/stylesheet/style.min.css">
+
+  <link rel="stylesheet" type="text/css" href="/theme/pygments/github.min.css">
+  <link rel="stylesheet" type="text/css" href="/theme/font-awesome/css/font-awesome.min.css">
+
+
+
+
+
+
+
+    <meta name="author" content="Marek Mikesell" />
+    <meta name="description" content="" />
+<meta property="og:site_name" content="147.Data"/>
+<meta property="og:type" content="blog"/>
+<meta property="og:title" content="147.Data"/>
+<meta property="og:description" content=""/>
+<meta property="og:locale" content="en_US"/>
+<meta property="og:url" content=""/>
+
+  <title>147.Data &ndash; Multiple Linear Regression</title>
+
+</head>
+<body>
+  <aside>
+    <div>
+      <a href="">
+         <p><h2>Marek Mikesell</h2></p>
+        <!--img src="/theme/img/profile.png" alt="" title=""-->
+      </a>
+      <h1><a href=""></a></h1>
+
+
+      <nav>
+        <ul class="list">
+          <li><a href="/pages/about.html#about">About</a></li>
+          <li><a href="/pages/historical-sales-eda.html#historical-sales-eda">Historical Sales EDA</a></li>
+          <li><a href="/pages/multiple-linear-regression.html#multiple-linear-regression">Multiple Linear Regression</a></li>
+          <li><a href="/pages/time-series-solar-power.html#time-series-solar-power">Time Series - Solar Power</a></li>
+          <li><a href="/pages/top-female-chess-players-eda.html#top-female-chess-players-eda">Top Female Chess Players EDA</a></li>
+
+        </ul>
+      </nav>
+
+      <ul class="social">
+      </ul>
+    </div>
+
+
+  </aside>
+  <main>
+
+
+<article class="single">
+  <header>
+    
+    <h1 id="multiple-linear-regression">Multiple Linear Regression</h1>
+  </header>
+  <div>
+<p>Here I have a data set of fish. Please contain your excitement. This is a great data set for checking one's knowledge of the assumptions and missteps that can come with multiple linear regression. The goal is to use a multiple linear regression model to predict the weight of a fish.</p>
+<p><img alt="Info" src="../images/fish_img/info.png" title="Fish Info">
+<img alt="Species" src="../images/fish_img/species.png" title="Species"></p>
+<p>A quick check of the distributions.  </p>
+<p><img alt="Pairplot" src="../images/fish_img/pairplot.png" title="Pairplot"></p>
+<p>A lot of good info here, mostly in the top row. The first thing that jumps out to me are the distinct groupings in the scatter plots for 'Weight' against the 'Height' and 'Length' variables. The second observation is that the relationship between the dependant and independant variables isn't linear. The third observation is that there is clear multicollinearity among the independant variables (almost perfect among the Lengths). I will address these one at a time.  </p>
+<p><strong>Non-linear Transformation</strong><br>
+To address the non-linear relationship between dependent and independant variables, I test multiple transformations on the 'Weight' variable. My best option turns out to be an exponential transformation of (1/3).</p>
+<p><img alt="QQ-Plot" src="../images/fish_img/qqplot.png" title="QQ Plot">
+<img alt="Transform" src="../images/fish_img/transform.png" title="Transform"></p>
+<p>That's better. Now the relationship is linear.</p>
+<p><strong>Multicollinearity</strong>
+This can be a serious problem, but how bad is it?</p>
+<p><img alt="Corr Matrix" src="../images/fish_img/corr.png" title="Correlation Matrix"></p>
+<p>It's bad. I keep only Length3 of the three lengths available, as they are almost the same data. I keep 'Length3' as it has the highest correlation with the depedant variable by a tiny margin. However, 'Weight' and 'Height' share a high correlations as well. I'll take a closer look at these variable before making any decisions.  </p>
+<p>Height:
+<img alt="Height" src="../images/fish_img/height.png" title="Height"></p>
+<p>Width:
+<img alt="Width" src="../images/fish_img/width.png" title="Width">  </p>
+<p>Length:<br>
+<img alt="Length" src="../images/fish_img/length.png" title="Length"></p>
+<p>After a cursory glance, I see that these groupings are clearly the result of being from a different species. With Pike being it's own group in both 'Length' and 'Height', and Parkki and Bream dilineating into a grouping in 'Height'.</p>
+<p>To get an idea of the how badly these outliers affect predictions, I build a linear model with 'Width' as the only predictor variable. I then plot the absolute residuals against the 'Width'. As expected, the outliers cause massive residuals and pronounced heteroskedasticity.  </p>
+<p><img alt="Width Residuals" src="../images/fish_img/width_resid.png" title="Width Residuals"></p>
+<p>There are definitely many ways I could go about dealing with this, but I'm going to inject a few binary groupings into the data-set. The first group is 'IsPike', because it is it's own separate group in 'Height' and 'Weight'.</p>
+<p>I also create two 'HeightGroup' variables 'HeightGroup1' and 'HeightGroup2' for the differen't groupings present in 'Height'. Lastly, I create an 'IsBream' to help the model keep the higher end residuals under control. By separating Bream into it's own group, I am hoping the model will notice the difference in 'Width' groupings among Bream and Perch - a less obvious division but a cause of some of the larger residuals.  </p>
+<p><img alt="Width Resid2" src="../images/fish_img/width_resid2.png" title="New Residuals"></p>
+<p>The new range of absolute residuals has decreased dramatically.</p>
+<p>There is still work to be done here. I will update this project soon with any progress.</p>  </div>
+</article>
+
+    <footer>
+<p>&copy;  </p>
+<p>    Powered by <a href="http://getpelican.com" target="_blank">Pelican</a> - <a href="https://github.com/alexandrevicenzi/flex" target="_blank">Flex</a> theme by <a href="http://alexandrevicenzi.com" target="_blank">Alexandre Vicenzi</a>
+</p>    </footer>
+  </main>
+
+
+
+
+<script type="application/ld+json">
+{
+  "@context" : "http://schema.org",
+  "@type" : "Blog",
+  "name": " 147.Data ",
+  "url" : "",
+  "image": "",
+  "description": ""
+}
+</script>
+
+</body>
+</html>
